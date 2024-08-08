@@ -1,0 +1,29 @@
+<div>
+  <h1>ToDo List</h1>
+  <input [(ngModel)]="newTodo" placeholder="Add a new task" />
+  <button (click)="addToDo()">Add</button>
+
+  <ul>
+    <li *ngFor="let todo of todos">
+      <input
+        type="checkbox"
+        [(ngModel)]="todo.completed"
+        (change)="updateTodoStatus(todo.id!, todo.completed!)"
+      />
+      <input
+        *ngIf="!todo.editing"
+        type="text"
+        [value]="todo.title"
+        readonly
+      />
+      <input
+        *ngIf="todo.editing"
+        type="text"
+        [(ngModel)]="todo.title"
+      />
+      <button *ngIf="!todo.editing" (click)="editToDo(todo)">Edit</button>
+      <button *ngIf="todo.editing" (click)="saveTodo(todo)">Save</button>
+      <button (click)="deleteToDo(todo.id!)" class="delete">Delete</button>
+    </li>
+  </ul>
+</div>
