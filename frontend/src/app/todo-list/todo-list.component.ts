@@ -19,40 +19,52 @@ export class TodoListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.todoService.getToDos().subscribe(
-      (todos) => (this.todos = todos),
-      (error) => console.error('Error fetching todos:', error)
-    );
+    this.todoService.getToDos().subscribe({
+      next: (todos) => (this.todos = todos),
+      error: (error) => {
+        console.error('Error fetching todos:', error)
+      }
+    });
   }
 
   addToDo() {
     if (this.newTodo.trim()) {
       const todo: ToDo = {title: this.newTodo, completed: false};
-      this.todoService.addToDos(todo).subscribe(
-        (newToDo) => this.todos.push(newToDo),
-        (error) => console.error('Error adding todo:', error)
-      );
+      this.todoService.addToDos(todo).subscribe({
+        next: (newToDo) => this.todos.push(newToDo),
+        error: (error) => console.error('Error adding todo:', error)
+      });
       this.newTodo = '';
     }
   }
 
   deleteToDo(id: number) {
-    this.todoService.deleteToDos(id).subscribe(
-      () => (this.todos = this.todos.filter((todo) => todo.id !== id)),
-      (error) => console.error('Error deleting todo:', error)
-    );
+    this.todoService.deleteToDos(id).subscribe({
+      next: () => (this.todos = this.todos.filter((todo) => todo.id !== id)),
+      error: (error) => {
+        console.error('Error deleting todo:', error)
+      },
+      complete: () => {
+        console.log("Todo Deleted Successfully")
+      }
+    });
   }
 
   updateTodoStatus(id: number, completed: boolean) {
-    this.todoService.updateToDoStatus(id, completed).subscribe(
-      (updatedTodo) => {
+    this.todoService.updateToDoStatus(id, completed).subscribe({
+      next: (updatedTodo) => {
         const index = this.todos.findIndex((t) => t.id === updatedTodo.id);
         if (index !== -1) {
           this.todos[index] = updatedTodo;
         }
       },
-      (error) => console.error('Error updating todo status:', error)
-    );
+      error: (error) => {
+        console.error('Error updating todo status:', error)
+      },
+      complete: () => {
+        console.log("Todo updated successFully");
+      }
+    });
   }
 
   editToDo(todo: ToDo) {
@@ -61,15 +73,21 @@ export class TodoListComponent implements OnInit {
 
   saveTodo(todo: ToDo) {
     if (todo.title?.trim()) {
-      this.todoService.updateToDoTitle(todo.id!, todo.title!).subscribe(
-        (updatedTodo) => {
+      this.todoService.updateToDoTitle(todo.id!, todo.title!).subscribe({
+        next: (updatedTodo) => {
           const index = this.todos.findIndex((t) => updatedTodo.id);
           if (index !== 1) {
             this.todos[index] = updatedTodo;
             this.todos[index].editing = false;
           }
+        },
+        error: (error) => {
+          console.log("Error While Save Todo", error);
+        },
+        complete: () => {
+          console.log("Save Todo Completed");
         }
-      );
+      });
     } else {
       todo.editing = false;
     }
